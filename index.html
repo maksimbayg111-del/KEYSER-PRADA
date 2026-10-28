@@ -223,6 +223,10 @@ body::before{display:none}
 .md2{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:start}.mleft{text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;padding:10px}.mleft img{width:100%;max-height:90px;object-fit:contain}.mleft b{font:600 18px var(--f)}.ms{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:12px;background:rgba(0,0,0,.4);border:1px solid #444;animation:pg .3s}.ms b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font:600 20px var(--f)}.mp{font-weight:700}
 #nt{position:fixed;top:-130px;left:50%;transform:translateX(-50%);z-index:300;display:flex;gap:12px;align-items:center;padding:10px 16px;border-radius:14px;background:#14231a;border:2px solid var(--g);width:min(420px,94vw);transition:top .45s cubic-bezier(.2,1.3,.4,1)}#nt.on{top:12px}#nt img{width:70px;height:52px;object-fit:contain}#nt b{display:block;font:600 20px var(--f)}#nt span{font-size:14px}
 @media(max-width:480px){.md2{grid-template-columns:100px 1fr}.ms b{font-size:17px}.ms .btn{padding:8px 10px;font-size:16px}}
+
+.md2{grid-template-columns:minmax(150px,210px) minmax(0,1fr)}.mleft{min-width:0;padding:12px 10px}.mleft img{max-height:none;aspect-ratio:4/3;width:100%}.mleft .btn{width:100%;justify-content:center;padding:10px 6px;font-size:20px}.mleft .btn svg{display:none}.ms{flex-wrap:wrap}.ms b{flex:1 1 70px}.ms .btn{margin-left:auto}
+.av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;object-fit:cover;flex:none;background:#2a2d28;border:2px solid #555;color:#9aa;font-weight:700}
+@media(max-width:480px){.md2{grid-template-columns:minmax(120px,132px) minmax(0,1fr)}.mleft .btn{font-size:18px}}
 </style></head><body><div id="bgimg"></div>
 <header><div id="bar"></div>
 <div id="menu"></div><div id="tick"><div class="dot"><i></i></div></div></header>
@@ -404,7 +408,7 @@ function ad(){if(adRun||adLeft())return;adRun=true;const o=$('#ad');let n=AD_T;
 function adBtn(){if(adRun)return;if(busy)return toast('Дождись конца открытия');if(adLeft())return toast('Следующая реклама через '+adLeft()+' с');ad()}
 /* профиль */
 function vProf(){const b=S.best!=null&&ITEMS[S.best];
- return `<h1>Профиль${CL?' · '+esc(S.nick):''}</h1>${b?`<div class="best r${b.r}"><img src="${b.img}" alt=""><div><small>Самый дорогой скин</small><b>${b.n}</b><div class="bp">${fmt(b.p)}</div></div></div>`:'<div class="best"><span class="mut">—</span></div>'}<div class="pn" style="font-size:18px"><div class="hr"><span>Кейсов открыто</span><b>${S.op}</b></div><div class="hr"><span>Потрачено</span><b>${fmt(S.sp)}</b></div><div class="hr"><span>Стоимость инвентаря</span><b>${fmt(invVal())}</b></div><div class="hr"><span>Апгрейдов (успешных)</span><b>${S.up} (${S.uw})</b></div></div>
+ return `<h1>Профиль${CL?' · '+esc(S.nick):''}</h1>${CL?`<div class="row ctr" style="align-items:center">${avH(S.av,72)}<label class="btn gr2">Выбрать аватарку<input type="file" accept="image/*" hidden onchange="setAv(this)"></label>${S.av?`<button class="btn dk" onclick="S.av='';save();render()">Убрать</button>`:''}</div>`:''}${b?`<div class="best r${b.r}"><img src="${b.img}" alt=""><div><small>Самый дорогой скин</small><b>${b.n}</b><div class="bp">${fmt(b.p)}</div></div></div>`:'<div class="best"><span class="mut">—</span></div>'}<div class="pn" style="font-size:18px"><div class="hr"><span>Кейсов открыто</span><b>${S.op}</b></div><div class="hr"><span>Потрачено</span><b>${fmt(S.sp)}</b></div><div class="hr"><span>Стоимость инвентаря</span><b>${fmt(invVal())}</b></div><div class="hr"><span>Апгрейдов (успешных)</span><b>${S.up} (${S.uw})</b></div></div>
 <div class="row ctr"><button class="btn gr2" onclick="exp()">${ic('dl')}Экспорт</button><label class="btn gr2">${ic('ul')}Импорт<input type="file" accept=".json" hidden onchange="imp(this)"></label><button class="btn gr2" onclick="ask('Сбросить весь прогресс?',()=>{load();render()})">Сброс</button></div>
 <div class="row ctr"><button class="btn gr2 w" onclick="admOpen()">${ic('lock')}Админ Панель</button></div>
 ${CL?`<div class="row ctr"><button class="btn gr2 w" onclick="logout()">Выйти из аккаунта</button></div>`:''}<h2>История</h2><div class="pn" id="hist"></div>`}
@@ -436,7 +440,7 @@ function admEnter(){modal(`<div class="ask" id="aw"><h2>Введите код</h
 function admCheck(){const i=$('#acode');if(!i)return;if(!i.value.trim())return toast('Введите код');
   if(_k(i.value)===_d()){ADM=1;admKeep();rdr=1;sellSnd();admPanel();toast('Админ Панель открыта')}
   else{i.value='';const a=$('#aw');a.classList.remove('bad');void a.offsetWidth;a.classList.add('bad');beep(160,.25,'sawtooth',.07);toast('Неверный код')}}
-function admPanel(){if(!ADM)return;modal(`<div class="ask"><h2>Админ Панель</h2><div class="hr"><span>Баланс</span><b id="abal">${fmt(S.b)}</b></div><p class="mut" style="margin:10px 0 10px">Выдать себе монеты — до ${num(AMAX)} за раз</p><input class="ain adm-i" id="aamt" type="number" inputmode="numeric" min="1" max="${AMAX}" placeholder="Сумма" oninput="if(+this.value>${AMAX})this.value=${AMAX}"><div class="row ctr chips">${[10000,100000,500000,AMAX].map(v=>`<button class="btn dk" onclick="$('#aamt').value=${v}">${v==AMAX?'МАКС':'+'+num(v)}</button>`).join('')}</div><div class="row ctr"><button class="btn gr2" onclick="closeM()">Закрыть</button><button class="btn" onclick="admGive()">Выдать</button></div></div>`)}
+function admPanel(){if(!ADM)return;setTimeout(admStats,0);modal(`<div class="ask"><h2>Админ Панель</h2><div class="hr"><span>Баланс</span><b id="abal">${fmt(S.b)}</b></div><div class="hr"><span>Игроков всего</span><b id="apl">…</b></div><div class="hr"><span>Сейчас онлайн</span><b id="aon">…</b></div><p class="mut" style="margin:10px 0 10px">Выдать себе монеты — до ${num(AMAX)} за раз</p><input class="ain adm-i" id="aamt" type="number" inputmode="numeric" min="1" max="${AMAX}" placeholder="Сумма" oninput="if(+this.value>${AMAX})this.value=${AMAX}"><div class="row ctr chips">${[10000,100000,500000,AMAX].map(v=>`<button class="btn dk" onclick="$('#aamt').value=${v}">${v==AMAX?'МАКС':'+'+num(v)}</button>`).join('')}</div><div class="row ctr"><button class="btn gr2" onclick="closeM()">Закрыть</button><button class="btn" onclick="admGive()">Выдать</button></div></div>`)}
 function admGive(){if(!ADM)return;const i=$('#aamt'),n=Math.floor(+(i&&i.value));if(!(n>=1))return toast('Введите сумму');if(n>AMAX)return toast('Максимум '+num(AMAX)+' за раз');
   S.b+=n;updBal();DB.add({t:Date.now(),k:'adm',n:'баланс',p:n});save();sellSnd();const b=$('#abal');if(b)b.innerHTML=fmt(S.b);i.value='';toast('+'+num(n)+' монет')}
 
@@ -481,39 +485,54 @@ const push=()=>op(pushIn);
 const kind=i=>KN.includes(i)?'Нож':'Скин',lst=i=>MK.filter(x=>x.k==i).sort((a,b)=>a.price-b.price);
 function mktOn(){if(!CL||mktOn.d)return;mktOn.d=1;FB.onSnapshot(FB.collection(FB.db,'market'),s=>{MK=s.docs.map(x=>({id:x.id,...x.data()}));if(tab!='mkt')return;const g=$('#mkg'),l=$('#mkl');if(g)g.innerHTML=mgrid();if(l)l.innerHTML=slots()},()=>toast('Рынок недоступен'))}
 const mgrid=()=>ITEMS.filter(x=>x.n.toLowerCase().includes(mq)).map(x=>{const n=lst(x.id).length;return `<div class="mr" style="border-left:5px solid ${RC[x.r]}" onclick="mOpen(${x.id})"><img src="${x.img}" alt=""><div><b>${x.n}</b><small>${kind(x.id)} · ${RN[x.r]}</small></div>${n?`<span class="mn">${n}</span>`:''}</div>`}).join('');
-const slots=()=>{const L=lst(mi);return L.length?L.map(x=>`<div class="ms"><b>${esc(x.nick)}</b><span class="mp">${fmt(x.price)}</span>${x.seller==UID?`<button class="btn dk" onclick="mCancel('${x.id}')">Отмена</button>`:`<button class="btn" onclick="mBuy('${x.id}')">Купить</button>`}</div>`).join(''):'<p class="mut">Сейчас никто не продаёт этот предмет</p>'};
+const slots=()=>{const L=lst(mi);return L.length?L.map(x=>`<div class="ms">${avH(x.av,34)}<b>${esc(x.nick)}</b><span class="mp">${fmt(x.price)}</span>${x.seller==UID?`<button class="btn dk" onclick="mCancel('${x.id}')">Отмена</button>`:`<button class="btn" onclick="mBuy('${x.id}')">Купить</button>`}</div>`).join(''):'<p class="mut">Сейчас никто не продаёт этот предмет</p>'};
 function vMkt(){mktOn();if(mi===null)return `<h1>Рынок</h1>${CL?'':'<p class="mut">Firebase не настроен — аккаунты и рынок отключены</p>'}<div class="srch">${ic('search')}<input placeholder="Поиск…" oninput="mq=this.value.toLowerCase();$('#mkg').innerHTML=mgrid()"></div><div id="mkg">${mgrid()}</div>`;
  const x=ITEMS[mi];return `<p><button class="btn gr2" onclick="mi=null;nav=1;render()">${ic('back')}Назад</button></p><div class="md2"><div class="pn mleft"><img src="${x.img}" alt=""><b>${x.n}</b><button class="btn" onclick="mSell(${mi})">${ic('tag')}Продать</button></div><div id="mkl">${slots()}</div></div>`}
-function mOpen(i){mi=i;nav=1;render();scrollTo(0,0)}
+function mOpen(i){pop();mi=i;nav=1;render();scrollTo(0,0)}
 const mpr=()=>Math.floor(+$('#mpr').value),mCalc=()=>{const p=mpr();$('#mrc').innerHTML=p>=1?fmt(Math.floor(p*.85)):'—'};
 function mSell(i){if(busy||MX)return;if(!CL)return toast('Сначала настройте Firebase');
  if(!S.inv.some(x=>x.k==i))return modal(`<div class="ask"><h2>У вас нет этого предмета в инвентаре</h2><button class="btn gr2" onclick="closeM()">Ок</button></div>`);
  modal(`<div class="ask"><h2>${ITEMS[i].n}</h2><input class="ain" id="mpr" type="number" inputmode="numeric" min="1" max="10000000" value="${ITEMS[i].p}" oninput="mCalc()"><p class="mut">Вы получите: <b id="mrc"></b> (комиссия 15%)</p><div class="row ctr"><button class="btn gr2" onclick="closeM()">Отмена</button><button class="btn" onclick="mList(${i})">Выставить</button></div></div>`);mCalc()}
-const merr=e=>toast(e=='gone'?'Лот уже продан или снят':e=='money'?'Недостаточно средств':e=='none'?'У вас нет этого предмета':e=='ver'?'Данные обновились, повторите':'Ошибка, повторите');
+const merr=e=>{tone(300,.18,.07,'triangle');merr0(e)},merr0=e=>toast(e=='gone'?'Лот уже продан или снят':e=='money'?'Недостаточно средств':e=='none'?'У вас нет этого предмета':e=='ver'?'Данные обновились, повторите':'Ошибка, повторите');
 async function mList(i){const p=mpr();if(!(p>=1&&p<=1e7))return toast('Цена от 1 до 10 000 000');if(MX)return;MX=1;closeM();
  try{await op(async()=>{await pushIn();const x=S.inv.find(v=>v.k==i);if(!x)throw'none';const l=FB.doc(FB.collection(FB.db,'market'));
-  await FB.runTransaction(FB.db,async t=>{const s=(await t.get(ur())).data();chk(s);if(s.inv[x.u]!==i)throw'none';const inv={...s.inv};delete inv[x.u];t.update(ur(),{inv,ver:s.ver+1});t.set(l,{seller:UID,nick:S.nick,k:i,u:x.u,price:p,t:FB.serverTimestamp()})});
-  S.inv=S.inv.filter(v=>v.u!=x.u);S.ver++;sync()});sellSnd();toast('Выставлено на рынок')}catch(e){merr(e)}MX=0;render()}
+  await FB.runTransaction(FB.db,async t=>{const s=(await t.get(ur())).data();chk(s);if(s.inv[x.u]!==i)throw'none';const inv={...s.inv};delete inv[x.u];t.update(ur(),{inv,ver:s.ver+1});t.set(l,{seller:UID,nick:S.nick,k:i,u:x.u,price:p,av:S.av||"",t:FB.serverTimestamp()})});
+  S.inv=S.inv.filter(v=>v.u!=x.u);S.ver++;sync()});pop();toast('Выставлено на рынок')}catch(e){merr(e)}MX=0;render()}
 async function mCancel(id){if(MX)return;MX=1;
  try{await op(async()=>{await pushIn();const lr=FB.doc(FB.db,'market',id);let L;
   await FB.runTransaction(FB.db,async t=>{const ls=await t.get(lr);if(!ls.exists())throw'gone';L=ls.data();if(L.seller!==UID)throw'gone';const s=(await t.get(ur())).data();chk(s);t.update(ur(),{inv:{...s.inv,[L.u]:L.k},ver:s.ver+1});t.delete(lr)});
-  S.inv.push({u:L.u,k:L.k});S.ver++;sync()});toast('Предмет возвращён в инвентарь')}catch(e){merr(e)}MX=0;render()}
+  S.inv.push({u:L.u,k:L.k});S.ver++;sync()});pop();toast('Предмет возвращён в инвентарь')}catch(e){merr(e)}MX=0;render()}
 async function mBuy(id){if(MX||busy)return;const C=MK.find(x=>x.id==id);if(!C)return toast('Лот уже продан');if(C.seller==UID)return;if(S.b<C.price)return toast('Недостаточно средств');MX=1;
  try{const L=await op(async()=>{await pushIn();const lr=FB.doc(FB.db,'market',id),sr=FB.doc(FB.db,'users',C.seller,'sales',id);let L;
   await FB.runTransaction(FB.db,async t=>{const ls=await t.get(lr);if(!ls.exists())throw'gone';L=ls.data();if(L.seller!==C.seller||L.seller===UID)throw'gone';const s=(await t.get(ur())).data();chk(s);if(s.b<L.price)throw'money';
    t.update(ur(),{b:s.b-L.price,inv:{...s.inv,[s.uid]:L.k},uid:s.uid+1,ver:s.ver+1});t.delete(lr);t.set(sr,{amt:Math.floor(L.price*.85),k:L.k,price:L.price,by:S.nick,t:FB.serverTimestamp()})});
   S.b-=L.price;S.inv.push({u:S.uid,k:L.k});S.uid++;S.ver++;sync();return L});
-  updBal();sellSnd();note(ITEMS[L.k],L.price)}catch(e){merr(e)}MX=0;render()}
+  updBal();chime();note(ITEMS[L.k],L.price)}catch(e){merr(e)}MX=0;render()}
 function note(x,p){let e=$('#nt');if(!e){e=document.createElement('div');e.id='nt';document.body.appendChild(e)}e.innerHTML=`<img src="${x.img}" alt=""><div><b>${x.n}</b><span>Вы купили ${x.n} за ${fmt(p)}</span></div>`;e.classList.remove('on');void e.offsetWidth;e.classList.add('on');clearTimeout(note.t);note.t=setTimeout(()=>e.classList.remove('on'),4500)}
 /* зачисление денег продавцу: проданный лот приходит как документ sales, забирается транзакцией ровно один раз */
 const CLM=new Set();
 function salesOn(){FB.onSnapshot(FB.collection(FB.db,'users',UID,'sales'),s=>s.docs.forEach(d=>{if(!CLM.has(d.id)){CLM.add(d.id);claim(d.id,d.data())}}))}
 function claim(id,v){op(async()=>{await pushIn();const sr=FB.doc(FB.db,'users',UID,'sales',id);
  try{await FB.runTransaction(FB.db,async t=>{if(!(await t.get(sr)).exists())throw'gone';const s=(await t.get(ur())).data();chk(s);t.update(ur(),{b:s.b+v.amt,ver:s.ver+1});t.delete(sr)});
-  S.b+=v.amt;S.ver++;sync();updBal();sellSnd();toast(`Продано: ${ITEMS[v.k].n} · +${num(v.amt)}`)}
+  S.b+=v.amt;S.ver++;sync();updBal();bell();toast(`Продано: ${ITEMS[v.k].n} · +${num(v.amt)}`)}
  catch(e){if(e!=='gone')setTimeout(()=>claim(id,v),3000)}})}
+
+/* ===== v17: аватарки, онлайн, звуки рынка ===== */
+const avH=(a,s=32)=>/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(a||'')?`<img class="av" style="width:${s}px;height:${s}px" src="${a}" alt="">`:`<span class="av" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.6)}px">?</span>`;
+/* выбранный файл (до 100 МБ) сжимается до 96×96 — так он быстро грузится и помещается в бесплатную базу */
+async function setAv(i){const f=i.files[0];i.value='';if(!f)return;if(!f.type.startsWith('image/'))return toast('Нужна картинка');if(f.size>104857600)return toast('Файл больше 100 МБ');
+ try{const b=await createImageBitmap(f),c=document.createElement('canvas');c.width=c.height=96;const m=Math.min(b.width,b.height),x=c.getContext('2d');x.fillStyle='#222';x.fillRect(0,0,96,96);x.drawImage(b,(b.width-m)/2,(b.height-m)/2,m,m,0,0,96,96);S.av=c.toDataURL('image/jpeg',.82);if(b.close)b.close();save();render();toast('Аватарка обновлена')}catch(e){toast('Не удалось открыть картинку')}}
+/* мягкие звуки: колокольчик, уведомление, щелчок */
+function tone(f,d,v,ty='sine',w=0){if(!S.snd)return;try{const c=actx(),o=c.createOscillator(),g=c.createGain(),s=c.currentTime+w;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+.005);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(c.destination);o.start(s);o.stop(s+d+.05)}catch(e){}}
+const bell=()=>{[[1,.2,1.3],[2.4,.09,.9],[4.1,.05,.5]].forEach(a=>tone(988*a[0],a[2],a[1]));tone(1480,.9,.07,'sine',.14)};
+const chime=()=>[659,880,1318].forEach((f,i)=>tone(f,.55,.13,'sine',i*.09));
+const pop=()=>{tone(520,.07,.1,'triangle');tone(780,.06,.05,'sine',.012)};
+/* онлайн: раз в 3 минуты, пока вкладка открыта, игрок отмечается в profiles */
+function beat(){let last=0;const f=()=>{if(document.visibilityState!='visible'||Date.now()-last<6e4)return;last=Date.now();FB.setDoc(FB.doc(FB.db,'profiles',UID),{nick:S.nick,seen:FB.serverTimestamp()}).catch(()=>{})};f();setInterval(f,18e4);document.addEventListener('visibilitychange',f)}
+async function admStats(){const a=$('#apl'),o=$('#aon');if(!a)return;if(!CL){a.textContent=o.textContent='—';return}
+ try{const c=FB.collection(FB.db,'profiles'),[t,n]=await Promise.all([FB.getCountFromServer(c),FB.getCountFromServer(FB.query(c,FB.where('seen','>',FB.Timestamp.fromMillis(Date.now()-3e5))))]);a.textContent=t.data().count;o.textContent=n.data().count}catch(e){a.textContent=o.textContent='ошибка'}}
 /* старт */
-(async()=>{await DB.open();let o=await DB.get('s');if(!o)try{o=JSON.parse(localStorage.getItem('kj3'))}catch(e){}if(CL)o=await cloudInit();load(o);if(CL){sync();salesOn()}shown=S.b;await admLoad();
+(async()=>{await DB.open();let o=await DB.get('s');if(!o)try{o=JSON.parse(localStorage.getItem('kj3'))}catch(e){}if(CL)o=await cloudInit();load(o);if(CL){sync();salesOn();beat()}shown=S.b;await admLoad();
  for(let i=0;i<8;i++)pushFeed(rndItem());setInterval(()=>{if(!busy)pushFeed(rndItem())},2600);
  nav=1;render()})();
 </script></body></html>
